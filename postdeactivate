@@ -1,0 +1,13 @@
+#!/bin/bash
+# This hook is sourced after every virtualenv is deactivated.
+
+for machine in $(docker-machine ls -q); do
+  if [[ "$machine" == "$proj_name" ]]; then
+    echo "docker-machine $proj_name exists, deactivating..."
+    eval $(docker-machine env -u)
+    echo "docker-machine stop $proj_name"
+    docker-machine stop $proj_name
+  fi
+done
+
+cd $HOME

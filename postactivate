@@ -1,0 +1,29 @@
+#!/bin/bash
+# This hook is sourced after every virtualenv is activated.
+
+proj_name=$(basename $VIRTUAL_ENV)
+export GOPATH=$PROJECT_HOME/$proj_name
+
+if [[ -f $PROJECT_HOME/$proj_name/.envrc ]]; then
+  echo "source .envrc"
+  cat $PROJECT_HOME/$proj_name/.envrc
+  source $PROJECT_HOME/$proj_name/.envrc
+fi
+
+for machine in $(docker-machine ls -q); do
+  if [[ "$machine" == "$proj_name" ]]; then
+    echo "docker-machine $proj_name exists, activating..."
+    echo "docker-machine start $proj_name"
+    docker-machine start $proj_name
+    docker-mahcine env $proj_name 2> /dev/null
+    rc=$?
+    if [[ $rc != 0 ]]; then
+      docker-machine regenerate-certs -f $proj_name
+    fi
+    eval $(docker-machine env $proj_name)
+    echo "Activated."
+    echo "To deactivate run:"
+    echo 'eval $(docker-machine env -u)'
+  fi
+done
+

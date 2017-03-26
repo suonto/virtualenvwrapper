@@ -1,0 +1,11 @@
+#!/bin/bash
+# This hook is run after a virtualenv is deleted.
+# argument: full path to environment directory
+
+set -e
+read -p "rm -rf $PROJECT_HOME/$1? (y/n)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    rm -rf $PROJECT_HOME/$1
+fi
